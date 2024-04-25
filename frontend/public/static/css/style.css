@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'HakoberaMaruGothicA-bold';
+    src: url(../font/HakoberaMaruGothicA-bold.ttf);
+}
+
+body {
+    font-family: 'HakoberaMaruGothicA-bold';
+}
