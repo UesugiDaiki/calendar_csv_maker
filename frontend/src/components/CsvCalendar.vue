@@ -186,8 +186,29 @@ export default {
             downloadLink.remove();
         },
         // Googleカレンダーに登録
-        registGoogle() {
-            registGoogleCalendar(this.events, this.calendarOptions.events)
+        async registGoogle() {
+            let responseData = await registGoogleCalendar(this.events, this.calendarOptions.events)
+            if (responseData.error) {
+                // トーストを表示
+                toast("登録に失敗しました", {
+                    "autoClose": 2000,
+                    "theme": "colored",
+                    "type": "error",
+                    "position": "bottom-center",
+                    "hideProgressBar": true,
+                    "transition": "slide",
+                })
+            } else {
+                // トーストを表示
+                toast("登録しました", {
+                    "autoClose": 2000,
+                    "theme": "colored",
+                    "type": "success",
+                    "position": "bottom-center",
+                    "hideProgressBar": true,
+                    "transition": "slide",
+                })
+            }
         }
     },
 }

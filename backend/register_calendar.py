@@ -1,14 +1,35 @@
+from __future__ import print_function
 from flask import redirect
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+
+import pytz  # pytzモジュールをインポート
+import os
 
 def register_google_calendar(eventsData):
-    # # カレンダーAPIのスコープを設定
+    # カレンダーAPIのスコープを設定
     SCOPES = ['https://www.googleapis.com/auth/calendar']
 
-    # ユーザー認証を行いAPIクライアントを作成
-    flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-    creds = flow.run_local_server(port=0)
+    creds = None
+    # token.jsonファイルにはユーザーのアクセスおよびリフレッシュトークンが保存されます。
+    if os.path.exists('token.json'):
+        # 既存の認証情報をロード
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    
+    # 有効な認証情報がない場合、ユーザーにログインさせます。
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            # 認証情報が期限切れの場合、トークンをリフレッシュ
+            creds.refresh(Request())
+        else:
+            # 新しい認証フローを開始
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # 次回の実行のために認証情報を保存します。
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
 
     service = build('calendar', 'v3', credentials=creds)
 
